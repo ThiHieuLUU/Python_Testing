@@ -57,6 +57,10 @@ def purchase_places():
     if places_required > available_point:
         abort(403, description="You can't book more than your available points!")
 
+    max_places = 12
+    if places_required > max_places:
+        abort(403, description="You can't book more than 12 places!")
+
     competition['number_of_places'] = int(competition['number_of_places']) - places_required
     flash('Great - booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
