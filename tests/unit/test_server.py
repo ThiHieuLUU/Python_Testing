@@ -31,3 +31,12 @@ def test_login_for_known_email__success(client):
     assert str.encode(string) in response.data
 
 
+def test_login_for_unknown_email__failure(client):
+    club = clubs[0]
+    # Test case for an unknown email
+    email = club["email"] + "x"
+    response = login(client, email)
+    assert response.status_code == 404
+    assert b"Sorry, that email wasn't found." in response.data
+
+
