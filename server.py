@@ -55,7 +55,7 @@ def purchase_places():
     available_point = int(club['points'])
 
     if places_required > available_point:
-        abort(403, description="You can't book more than your available points ")
+        abort(403, description="You can't book more than your available points!")
 
     competition['number_of_places'] = int(competition['number_of_places']) - places_required
     flash('Great - booking complete!')

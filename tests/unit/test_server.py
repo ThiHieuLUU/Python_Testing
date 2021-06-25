@@ -89,6 +89,7 @@ def test_purchase_places__success(client, club, competition):
     # Make sure the confirmation message is displayed
     assert b"Great - booking complete!" in response.data
 
+
 def test_purchase_places_using_more_than_club_points__failure(client, club, competition):
     """
     GIVEN a club logged in
@@ -108,4 +109,4 @@ def test_purchase_places_using_more_than_club_points__failure(client, club, comp
     ), follow_redirects=True)
 
     assert response.status_code == 403
-    assert b"You can't book more than your available points " in response.data
+    assert b"You can't book more than your available points!" in response.data
