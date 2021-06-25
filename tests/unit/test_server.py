@@ -89,3 +89,23 @@ def test_purchase_places__success(client, club, competition):
     # Make sure the confirmation message is displayed
     assert b"Great - booking complete!" in response.data
 
+def test_purchase_places_using_more_than_club_points__failure(client, club, competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary wants to book places which is greater than the club's points
+    THEN they receive an error message
+    """
+    club_name = club["name"]
+    available_point = int(club['points'])
+    competition_name = competition['name']
+
+    # Case not allowed: places required is greater than the available points of the club
+    places_required = available_point + 1
+    response = client.post("/purchasePlaces", data=dict(
+        places=places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 403
+    assert b"You can't book more than your available points " in response.data
