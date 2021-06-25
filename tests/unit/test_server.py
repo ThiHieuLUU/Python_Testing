@@ -65,4 +65,27 @@ def test_login_for_unknown_email__failure(client, club):
     assert b"Sorry, that email wasn't found." in response.data
 
 
+def test_purchase_places__success(client, club, competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary wants to book places
+    THEN they receive a confirmation message
+    """
+    max_places = 12
+    places_required = min(int(club['points']), max_places, int(competition["number_of_places"]))
+
+    club_name = club["name"]
+    competition_name = competition['name']
+
+    response = client.post("/purchasePlaces", data=dict(
+        places=places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 200
+    # Make sure the redirection is effected if the purchase is success.
+    assert b"<title>Summary | GUDLFT Registration</title>" in response.data  # welcome page
+    # Make sure the confirmation message is displayed
+    assert b"Great - booking complete!" in response.data
 
