@@ -1,5 +1,8 @@
+from collections import OrderedDict
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for, abort
+
+MAX_PLACES = 12
 
 
 def load_clubs():
@@ -55,15 +58,40 @@ def purchase_places():
     available_point = int(club['points'])
     available_places = int(competition['number_of_places'])
 
-    if places_required > available_point:
-        abort(403, description="You can't book more than your available points!")
+    booking_conditions = {
+        "available_point": available_point,
+        "max_places": MAX_PLACES,
+        "available_places": available_places
+    }
 
-    max_places = 12
-    if places_required > max_places:
-        abort(403, description="You can't book more than 12 places!")
+    error_messages = {
+        "available_point": "You can't book more than your available points!",
+        "max_places": "You can't book more than 12 places!",
+        "available_places": "You can't book more than available places of this competition!"
+    }
 
-    if places_required > available_places:
-        abort(400, description="You can't book more than available places of this competition!")
+    # sorted the dictionary by value using OrderedDict
+    booking_conditions_sorted = OrderedDict(sorted(booking_conditions.items(), key=lambda item: item[1]))
+    sorted_keys = list(booking_conditions_sorted.keys())
+    key_condition = sorted_keys[0]
+
+    value_condition = booking_conditions[key_condition]
+    error_message = error_messages[key_condition]
+
+    # Display only the error message associated with the smallest value for different conditions
+    # Here, there are 3 conditions to check: available_point, available_places and MAX_PLACES
+    # This avoids to depend on the order of if conditions
+    if places_required > value_condition:
+        abort(403, description=error_message)
+
+    # if places_required > available_point:
+    #     abort(403, description="You can't book more than your available points!")
+    #
+    # if places_required > MAX_PLACES:
+    #     abort(403, description="You can't book more than 12 places!")
+    #
+    # if places_required > available_places:
+    #     abort(400, description="You can't book more than available places of this competition!")
 
     competition['number_of_places'] = available_places - places_required
     flash('Great - booking complete!')
