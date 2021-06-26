@@ -30,6 +30,9 @@ def update_competitions_json(updated_competitions):
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
+competitions = load_competitions()
+clubs = load_clubs()
+
 
 @app.route('/')
 def index():
@@ -38,8 +41,6 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def show_summary():
-    competitions = load_competitions()
-    clubs = load_clubs()
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
     except IndexError:
@@ -49,9 +50,6 @@ def show_summary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
-    competitions = load_competitions()
-    clubs = load_clubs()
-
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
     if found_club and found_competition:
@@ -63,11 +61,11 @@ def book(competition, club):
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchase_places():
-    competitions = load_competitions()
-    clubs = load_clubs()
+    competitions_updated = load_competitions()
+    clubs_updated = load_clubs()
 
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
+    competition = [c for c in competitions_updated if c['name'] == request.form['competition']][0]
+    club = [c for c in clubs_updated if c['name'] == request.form['club']][0]
 
     places_required = int(request.form['places'])
     available_point = int(club['points'])
