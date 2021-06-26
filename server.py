@@ -17,11 +17,18 @@ def load_competitions():
         return list_of_competitions
 
 
+def update_clubs_json(updated_clubs):
+    with open("clubs.json", "w") as c:
+        json.dump(updated_clubs, c)
+
+
+def update_competitions_json(updated_competitions):
+    with open("competitions.json", "w") as comps:
+        json.dump(updated_competitions, comps)
+
+
 app = Flask(__name__)
 app.secret_key = 'something_special'
-
-competitions = load_competitions()
-clubs = load_clubs()
 
 
 @app.route('/')
@@ -31,6 +38,8 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def show_summary():
+    competitions = load_competitions()
+    clubs = load_clubs()
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
     except IndexError:
@@ -40,6 +49,9 @@ def show_summary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
+    competitions = load_competitions()
+    clubs = load_clubs()
+
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
     if found_club and found_competition:
@@ -51,6 +63,9 @@ def book(competition, club):
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchase_places():
+    competitions = load_competitions()
+    clubs = load_clubs()
+
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
 
@@ -83,19 +98,10 @@ def purchase_places():
     # This avoids to depend on the order of if conditions
     if places_required > value_condition:
         abort(403, description=error_message)
-
-    # if places_required > available_point:
-    #     abort(403, description="You can't book more than your available points!")
-    #
-    # if places_required > MAX_PLACES:
-    #     abort(403, description="You can't book more than 12 places!")
-    #
-    # if places_required > available_places:
-    #     abort(400, description="You can't book more than available places of this competition!")
-
-    competition['number_of_places'] = available_places - places_required
-    flash('Great - booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    else:
+        competition['number_of_places'] = available_places - places_required
+        flash('Great - booking complete!')
+        return render_template('welcome.html', club=club, competitions=competitions)
 
 
 # TODO: Add route for points display
