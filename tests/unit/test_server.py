@@ -1,30 +1,43 @@
 #!/usr/bin/venv python3
 
 import pytest
-from server import app, load_clubs, load_competitions
-
-clubs = load_clubs()
-competitions = load_competitions()
+from server import (
+    app,
+    load_clubs,
+    load_competitions,
+    update_clubs_json,
+    update_competitions_json,
+    MAX_PLACES
+)
 
 
 @pytest.fixture
 def client():
     app.config["TESTING"] = True
-
     yield app.test_client()  # tests run here
 
 
 @pytest.fixture
-def club():
-    """Tests will be realized with the first club."""
+def clubs():
+    """For the tests using updated clubs."""
+    return load_clubs()
 
+
+@pytest.fixture
+def competitions():
+    """For the tests using updated competitions."""
+    return load_competitions()
+
+
+@pytest.fixture
+def club(clubs):
+    """For the tests using the first club."""
     return clubs[0]
 
 
 @pytest.fixture
-def competition():
-    """Tests will be realized with the first competition."""
-
+def competition(competitions):
+    """For the tests using the first competition."""
     return competitions[0]
 
 
@@ -71,8 +84,9 @@ def test_purchase_places__success(client, club, competition):
     WHEN the secretary wants to book places
     THEN they receive a confirmation message
     """
-    max_places = 12
-    places_required = min(int(club['points']), max_places, int(competition["number_of_places"]))
+
+    # Make sure that places_required isn't exceeded: club's points, MAX_PLACES and competition's available places
+    places_required = min(int(club['points']), MAX_PLACES, int(competition["number_of_places"]))
 
     club_name = club["name"]
     competition_name = competition['name']
@@ -90,18 +104,33 @@ def test_purchase_places__success(client, club, competition):
     assert b"Great - booking complete!" in response.data
 
 
-def test_purchase_places_using_more_than_club_points__failure(client, club, competition):
+def test_purchase_places_using_more_than_club_points__failure(client, clubs, competitions):
     """
     GIVEN a club logged in
     WHEN the secretary wants to book places which is greater than the club's points
     THEN they receive an error message
     """
+
+    # Make sure that club's points is smaller than MAX_PLACES and competition's available places
+    # in order to receive the corresponding error message
+
+    clubs[0]["points"] = MAX_PLACES - 1
+    competitions[0]["number_of_places"] = MAX_PLACES
+
+    update_clubs_json({"clubs": clubs})
+    update_competitions_json({"competitions": competitions})
+
+    clubs = load_clubs()
+    competitions = load_competitions()
+
+    club = clubs[0]
+    competition = competitions[0]
+
     club_name = club["name"]
-    available_point = int(club['points'])
     competition_name = competition['name']
 
     # Case not allowed: places required is greater than the available points of the club
-    places_required = available_point + 1
+    places_required = club["points"] + 1
     response = client.post("/purchasePlaces", data=dict(
         places=places_required,
         club=club_name,
@@ -112,18 +141,32 @@ def test_purchase_places_using_more_than_club_points__failure(client, club, comp
     assert b"You can't book more than your available points!" in response.data
 
 
-def test_purchase_more_than_12_places_per_competition__failure(client, club, competition):
+def test_purchase_more_than_12_places_per_competition__failure(client, clubs, competitions):
     """
     GIVEN a club logged in
     WHEN the secretary wants to book more than 12 places per competition
     THEN they receive an error message
     """
+    # Make sure that MAX_PLACES is smaller than club's points and competition's available places
+    # in order to receive the corresponding error message
+
+    clubs[0]["points"] = MAX_PLACES + 1
+    competitions[0]["number_of_places"] = MAX_PLACES + 2
+
+    update_clubs_json({"clubs": clubs})
+    update_competitions_json({"competitions": competitions})
+
+    clubs = load_clubs()
+    competitions = load_competitions()
+
+    club = clubs[0]
+    competition = competitions[0]
+
     club_name = club["name"]
     competition_name = competition['name']
-    max_places = 12
 
-    # Case not allowed: places required is greater than max_places = 12
-    places_required = max_places + 1
+    # Case not allowed: places required is greater than MAX_PLACES = 12
+    places_required = MAX_PLACES + 1
     response = client.post("/purchasePlaces", data=dict(
         places=places_required,
         club=club_name,
@@ -134,12 +177,27 @@ def test_purchase_more_than_12_places_per_competition__failure(client, club, com
     assert b"You can't book more than 12 places!" in response.data
 
 
-def test_purchase_more_than_available_places_of_competition__failure(client, club, competition):
+def test_purchase_more_than_available_places_of_competition__failure(client, clubs, competitions):
     """
     GIVEN a club logged in
     WHEN the secretary wants to book more than available places of a competition
     THEN they receive an error message
     """
+    # Make sure that competition's available places is smaller than club's points and MAX_PLACES
+    # in order to receive the corresponding error message
+
+    clubs[0]["points"] = MAX_PLACES
+    competitions[0]["number_of_places"] = MAX_PLACES - 1
+
+    update_clubs_json({"clubs": clubs})
+    update_competitions_json({"competitions": competitions})
+
+    clubs = load_clubs()
+    competitions = load_competitions()
+
+    club = clubs[0]
+    competition = competitions[0]
+
     club_name = club["name"]
     competition_name = competition['name']
 
@@ -151,5 +209,5 @@ def test_purchase_more_than_available_places_of_competition__failure(client, clu
         competition=competition_name,
     ), follow_redirects=True)
 
-    assert response.status_code == 400
+    assert response.status_code == 403
     assert b"You can't book more than available places of this competition!" in response.data
