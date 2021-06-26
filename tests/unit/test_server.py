@@ -151,5 +151,5 @@ def test_purchase_more_than_available_places_of_competition__failure(client, clu
         competition=competition_name,
     ), follow_redirects=True)
 
-    assert response.status_code == 403
+    assert response.status_code == 400
     assert b"You can't book more than available places of this competition!" in response.data

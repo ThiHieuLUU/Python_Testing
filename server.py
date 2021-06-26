@@ -63,7 +63,7 @@ def purchase_places():
         abort(403, description="You can't book more than 12 places!")
 
     if places_required > available_places:
-        abort(403, description="You can't book more than available places of this competition!")
+        abort(400, description="You can't book more than available places of this competition!")
 
     competition['number_of_places'] = available_places - places_required
     flash('Great - booking complete!')
