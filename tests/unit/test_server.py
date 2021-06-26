@@ -132,3 +132,24 @@ def test_purchase_more_than_12_places_per_competition__failure(client, club, com
 
     assert response.status_code == 403
     assert b"You can't book more than 12 places!" in response.data
+
+
+def test_purchase_more_than_available_places_of_competition__failure(client, club, competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary wants to book more than available places of a competition
+    THEN they receive an error message
+    """
+    club_name = club["name"]
+    competition_name = competition['name']
+
+    # Case not allowed: places required is greater than available places of the competition
+    places_required = int(competition["number_of_places"]) + 1
+    response = client.post("/purchasePlaces", data=dict(
+        places=places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 403
+    assert b"You can't book more than available places of this competition!" in response.data
