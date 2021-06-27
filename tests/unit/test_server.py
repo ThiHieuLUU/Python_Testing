@@ -228,3 +228,26 @@ def test_purchase_reflect_points_remained(client, club, competition):
 
     assert response.status_code == 200
     assert str.encode(f'Points available: {new_available_point}\n') in response.data
+
+
+def test_purchase_negative_places__failure(client, club, competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary books some negative places
+    THEN they receive an error message
+    """
+
+    club_name = club["name"]
+    competition_name = competition['name']
+
+    # Make sure the booking is success
+    places_required = -10
+
+    response = client.post("/purchasePlaces", data=dict(
+        places=places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 403
+    assert b"You can't book a negative number of places" in response.data
