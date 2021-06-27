@@ -59,13 +59,26 @@ def book(competition, club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
+def build_dict(seq, key):
+    return dict((d[key], dict(d, index=index)) for (index, d) in enumerate(seq))
+
 @app.route('/purchasePlaces', methods=['POST'])
 def purchase_places():
     competitions_updated = load_competitions()
     clubs_updated = load_clubs()
 
-    competition = [c for c in competitions_updated if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs_updated if c['name'] == request.form['club']][0]
+    competitions_dict = build_dict(competitions_updated, key="name")
+    competition_name = request.form['competition']
+    competition = competitions_dict.get(competition_name)  # index key is added in information of competition
+    competition_index = competition["index"]  # index of the competition in the list from json file
+
+    clubs_dict = build_dict(clubs_updated, key="name")
+    club_name = request.form['club']
+    club = clubs_dict.get(club_name)  # index key is added in information of club
+    club_index = club["index"]  # index of the competition in the list from json file
+
+    # competition = [c for c in competitions_updated if c['name'] == request.form['competition']][0]
+    # club = [c for c in clubs_updated if c['name'] == request.form['club']][0]
 
     places_required = int(request.form['places'])
     available_point = int(club['points'])
@@ -97,9 +110,24 @@ def purchase_places():
     if places_required > value_condition:
         abort(403, description=error_message)
     else:
-        competition['number_of_places'] = available_places - places_required
+        # competition['number_of_places'] = available_places - places_required
         flash('Great - booking complete!')
-        return render_template('welcome.html', club=club, competitions=competitions)
+
+        new_available_point = available_point - places_required
+        new_number_of_places = available_places - places_required
+
+        # Update
+        club['points'] = str(new_available_point)
+        # competition['number_of_places'] = str(new_number_of_places)
+
+        clubs_updated[club_index]['points'] = str(new_available_point)
+        competitions_updated[competition_index]['number_of_places'] = str(new_number_of_places)
+
+        # Save the change to json files
+        update_clubs_json({"clubs": clubs_updated})
+        update_competitions_json({"competitions": competitions_updated})
+
+        return render_template('welcome.html', club=club, competitions=competitions_updated)
 
 
 # TODO: Add route for points display

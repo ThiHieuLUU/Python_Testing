@@ -202,3 +202,29 @@ def test_purchase_more_than_available_places_of_competition__failure(client, clu
 
     assert response.status_code == 403
     assert b"You can't book more than available places of this competition!" in response.data
+
+
+def test_purchase_reflect_points_remained(client, club, competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary books some places with success
+    THEN they see club's total points reduced
+    """
+
+    club_name = club["name"]
+    available_point = int(club['points'])
+
+    competition_name = competition['name']
+
+    # Make sure the booking is success
+    places_required = min(int(club['points']), MAX_PLACES, int(competition["number_of_places"]))
+    new_available_point = available_point - places_required
+
+    response = client.post("/purchasePlaces", data=dict(
+        places=places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 200
+    assert str.encode(f'Points available: {new_available_point}\n') in response.data
