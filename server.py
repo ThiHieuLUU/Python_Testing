@@ -109,6 +109,8 @@ def purchase_places():
     # This avoids to depend on the order of if conditions
     if places_required > value_condition:
         abort(403, description=error_message)
+    elif places_required < 0:
+        abort(403, description="You can't book a negative number of places")
     else:
         # competition['number_of_places'] = available_places - places_required
         flash('Great - booking complete!')
