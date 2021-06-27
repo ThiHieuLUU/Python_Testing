@@ -1,6 +1,8 @@
 #!/usr/bin/venv python3
 
 import pytest
+from datetime import timedelta, datetime
+
 from server import (
     app,
     load_clubs,
@@ -212,10 +214,10 @@ def test_purchase_reflect_points_remained(client, club, competition):
     """
 
     club_name = club["name"]
-    available_point = int(club['points'])
 
     competition_name = competition['name']
 
+    available_point = int(club['points'])
     # Make sure the booking is success
     places_required = min(int(club['points']), MAX_PLACES, int(competition["number_of_places"]))
     new_available_point = available_point - places_required
@@ -240,7 +242,6 @@ def test_purchase_negative_places__failure(client, club, competition):
     club_name = club["name"]
     competition_name = competition['name']
 
-    # Make sure the booking is success
     places_required = -10
 
     response = client.post("/purchasePlaces", data=dict(
@@ -251,3 +252,43 @@ def test_purchase_negative_places__failure(client, club, competition):
 
     assert response.status_code == 403
     assert b"You can't book a negative number of places" in response.data
+
+
+def test_purchase_future_places__success(client, club, competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary books some places in a future competition
+    THEN they receive a confirmation message
+    """
+    ten_days_after = datetime.now() + timedelta(days=10)
+    time_format = '%Y-%m-%d %H:%M:%S'
+    competition_date = ten_days_after.strftime(time_format)
+    # Set competition's date. Make sure that takes places in future.
+    competition["date"] = competition_date
+
+    update_clubs_json({"clubs": clubs})
+    update_competitions_json({"competitions": competitions})
+
+    clubs_updated = load_clubs()
+    competitions_updated = load_competitions()
+
+    club = clubs_updated[0]
+    competition = competitions_updated[0]
+
+    club_name = club["name"]
+    competition_name = competition['name']
+
+    # Make sure that places_required isn't exceeded: club's points, MAX_PLACES and competition's available places
+    places_required = min(int(club['points']), MAX_PLACES, int(competition["number_of_places"]))
+
+    response = client.post("/purchasePlaces", data=dict(
+        places=places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 200
+    # Make sure the redirection is effected if the purchase is success.
+    assert b"<title>Summary | GUDLFT Registration</title>" in response.data  # welcome page
+    # Make sure the confirmation message is displayed
+    assert b"Great - booking complete!" in response.data
