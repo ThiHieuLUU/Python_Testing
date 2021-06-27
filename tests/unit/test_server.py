@@ -292,3 +292,43 @@ def test_purchase_future_places__success(client, club, competition):
     assert b"<title>Summary | GUDLFT Registration</title>" in response.data  # welcome page
     # Make sure the confirmation message is displayed
     assert b"Great - booking complete!" in response.data
+
+
+def test_purchase_future_places__failure(client, club, competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary books some places in a future competition
+    THEN they receive an error message
+    """
+    ten_days_before = datetime.now() - timedelta(days=10)
+    time_format = '%Y-%m-%d %H:%M:%S'
+    competition_date = ten_days_before.strftime(time_format)
+    # Set competition's date. Make sure that already happened.
+    competition["date"] = competition_date
+
+    update_clubs_json({"clubs": clubs})
+    update_competitions_json({"competitions": competitions})
+
+    clubs_updated = load_clubs()
+    competitions_updated = load_competitions()
+
+    club = clubs_updated[0]
+    competition = competitions_updated[0]
+
+    club_name = club["name"]
+    competition_name = competition['name']
+
+    # Make sure that places_required isn't exceeded: club's points, MAX_PLACES and competition's available places
+    places_required = min(int(club['points']), MAX_PLACES, int(competition["number_of_places"]))
+
+    response = client.post("/purchasePlaces", data=dict(
+        places=places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 400
+    assert b"You can't book this past competition!" in response.data
+
+
+
