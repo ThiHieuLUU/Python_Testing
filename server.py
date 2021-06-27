@@ -1,3 +1,4 @@
+import datetime
 from collections import OrderedDict
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for, abort
@@ -77,9 +78,6 @@ def purchase_places():
     club = clubs_dict.get(club_name)  # index key is added in information of club
     club_index = club["index"]  # index of the competition in the list from json file
 
-    # competition = [c for c in competitions_updated if c['name'] == request.form['competition']][0]
-    # club = [c for c in clubs_updated if c['name'] == request.form['club']][0]
-
     places_required = int(request.form['places'])
     available_point = int(club['points'])
     available_places = int(competition['number_of_places'])
@@ -103,6 +101,10 @@ def purchase_places():
 
     value_condition = booking_conditions[key_condition]
     error_message = error_messages[key_condition]
+
+    # Checking if the competition is in the past.
+    if datetime.fromisoformat(competition["date"]) <= datetime.now():
+        abort(400, description="You can't book this past competition!")
 
     # Display only the error message associated with the smallest value for different conditions
     # Here, there are 3 conditions to check: available_point, available_places and MAX_PLACES
