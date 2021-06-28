@@ -106,6 +106,11 @@ def test_login_for_known_email__success(client, club):
     assert b"Logout" in response.data
     string = f'<h2>Welcome, {email} </h2>'
     assert str.encode(string) in response.data
+    # Check the feature of clubs' points board.
+    assert b"Clubs - Points:" in response.data
+
+    for club_member in clubs:
+        assert str.encode(f'{club_member["name"]} - {club_member["points"]}') in response.data
 
 
 def test_login_for_unknown_email__failure(client, club):
