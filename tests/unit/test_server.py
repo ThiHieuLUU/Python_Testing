@@ -288,7 +288,7 @@ def test_purchase_future_places__success(client, club, future_competition, valid
     WHEN the secretary books some places in a future competition
     THEN they receive a confirmation message
     """
-    club["point"] = MAX_PLACES - 1
+    club["points"] = MAX_PLACES - 1
     club = update_club()
 
     competition = future_competition
@@ -317,7 +317,7 @@ def test_purchase_past_places__failure(client, club, past_competition):
     WHEN the secretary books some places in a past competition
     THEN they receive an error message
     """
-    club["point"] = MAX_PLACES - 1
+    club["points"] = MAX_PLACES - 1
     club = update_club()
 
     competition = past_competition
@@ -385,3 +385,15 @@ def test_clubs_points_board_displayed_without_logged_in(client):
         assert str.encode(f'{club_member["name"]}: {club_member["points"]} points') in response.data
 
 
+def test_clubs_points_board_updated_when_log_out(client):
+    """
+    GIVEN a club logged in
+    WHEN the secretary clicks on the logout
+    THEN they see the updated clubs' points board
+    """
+    response = client.get("/logout", follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Clubs - Points:" in response.data
+    clubs_updated = load_clubs()
+    for club_member in clubs_updated:
+        assert str.encode(f'{club_member["name"]}: {club_member["points"]} points') in response.data
