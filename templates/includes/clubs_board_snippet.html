@@ -1,0 +1,11 @@
+<!--   Begin: Display club's points board    -->
+    <h3>Clubs - Points:</h3>
+    <ul>
+        {% for club_member in clubs%}
+        <li>
+            {{club_member["name"]}}: {{club_member["points"]}} points
+        </li>
+        <hr />
+        {% endfor %}
+    </ul>
+<!--   End: Display club's points board    -->

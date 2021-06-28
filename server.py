@@ -38,7 +38,8 @@ clubs = load_clubs()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    clubs_updated = load_clubs()
+    return render_template('index.html', clubs=clubs_updated)
 
 
 @app.route('/showSummary', methods=['POST'])
@@ -137,6 +138,10 @@ def purchase_places():
 
 
 # TODO: Add route for points display
+@app.route('/clubsPoints')
+def display_clubs_points():
+    clubs_updated = load_clubs()
+    return render_template('index.html', clubs=clubs_updated)
 
 
 @app.route('/logout')

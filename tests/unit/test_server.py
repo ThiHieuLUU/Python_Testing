@@ -372,6 +372,11 @@ def test_clubs_points_board_updated_after_success_purchase(client, club, future_
 
 
 def test_clubs_points_board_displayed_without_logged_in(client):
+    """
+    GIVEN a club not logged in
+    WHEN the secretary goes to the index page
+    THEN they see the clubs' points board
+    """
     response = client.get("/")
     assert response.status_code == 200
     assert b"Clubs - Points:" in response.data
