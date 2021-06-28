@@ -343,8 +343,8 @@ def test_purchase_past_places__failure(client, club, past_competition):
 def test_clubs_points_board_updated_after_success_purchase(client, club, future_competition, valid_places_required):
     """
     GIVEN a club logged in
-    WHEN the secretary wants to book places
-    THEN they receive a confirmation message
+    WHEN the secretary books places with success
+    THEN they receive a confirmation message and see the change of the clubs' points board
     """
     competition = future_competition
 
