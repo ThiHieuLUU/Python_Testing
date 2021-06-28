@@ -338,3 +338,36 @@ def test_purchase_past_places__failure(client, club, past_competition):
 
     assert response.status_code == 400
     assert b"You can't book this past competition!" in response.data
+
+
+def test_clubs_points_board_updated_after_success_purchase(client, club, future_competition, valid_places_required):
+    """
+    GIVEN a club logged in
+    WHEN the secretary wants to book places
+    THEN they receive a confirmation message
+    """
+    competition = future_competition
+
+    club_name = club["name"]
+    competition_name = competition['name']
+
+    response = client.post("/purchasePlaces", data=dict(
+        places=valid_places_required,
+        club=club_name,
+        competition=competition_name,
+    ), follow_redirects=True)
+
+    assert response.status_code == 200
+    # Make sure the redirection is effected if the purchase is success.
+    assert b"<title>Summary | GUDLFT Registration</title>" in response.data  # welcome page
+    # Make sure the confirmation message is displayed
+    assert b"Great - booking complete!" in response.data
+
+    # Check the feature of clubs' points board.
+    assert b"Clubs - Points:" in response.data
+
+    clubs_updated = load_clubs()
+    for club_member in clubs_updated:
+        assert str.encode(f'{club_member["name"]}: {club_member["points"]} points') in response.data
+
+
