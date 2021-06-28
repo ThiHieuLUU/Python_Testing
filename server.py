@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime
+
 from collections import OrderedDict
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for, abort
@@ -63,8 +64,10 @@ def book(competition, club):
 def build_dict(seq, key):
     return dict((d[key], dict(d, index=index)) for (index, d) in enumerate(seq))
 
+
 @app.route('/purchasePlaces', methods=['POST'])
 def purchase_places():
+    # Reload clubs and competitions in order to have updated information.
     competitions_updated = load_competitions()
     clubs_updated = load_clubs()
 
@@ -108,7 +111,7 @@ def purchase_places():
 
     # Display only the error message associated with the smallest value for different conditions
     # Here, there are 3 conditions to check: available_point, available_places and MAX_PLACES
-    # This avoids to depend on the order of if conditions
+    # Sorting conditions allows to avoid the depend on the order of if conditions and display correctly error.
     if places_required > value_condition:
         abort(403, description=error_message)
     elif places_required < 0:
@@ -120,14 +123,13 @@ def purchase_places():
         new_available_point = available_point - places_required
         new_number_of_places = available_places - places_required
 
-        # Update
+        # Update club's point after purchase
         club['points'] = str(new_available_point)
-        # competition['number_of_places'] = str(new_number_of_places)
 
         clubs_updated[club_index]['points'] = str(new_available_point)
         competitions_updated[competition_index]['number_of_places'] = str(new_number_of_places)
 
-        # Save the change to json files
+        # Save the change into json files
         update_clubs_json({"clubs": clubs_updated})
         update_competitions_json({"competitions": competitions_updated})
 
