@@ -371,3 +371,12 @@ def test_clubs_points_board_updated_after_success_purchase(client, club, future_
         assert str.encode(f'{club_member["name"]}: {club_member["points"]} points') in response.data
 
 
+def test_clubs_points_board_displayed_without_logged_in(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"Clubs - Points:" in response.data
+    clubs_updated = load_clubs()
+    for club_member in clubs_updated:
+        assert str.encode(f'{club_member["name"]}: {club_member["points"]} points') in response.data
+
+
