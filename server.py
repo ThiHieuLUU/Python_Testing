@@ -133,7 +133,7 @@ def purchase_places():
         update_clubs_json({"clubs": clubs_updated})
         update_competitions_json({"competitions": competitions_updated})
 
-        return render_template('welcome.html', club=club, competitions=competitions_updated)
+        return render_template('welcome.html', club=club, competitions=competitions_updated, clubs=clubs_updated)
 
 
 # TODO: Add route for points display

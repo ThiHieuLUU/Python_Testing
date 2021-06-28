@@ -110,7 +110,7 @@ def test_login_for_known_email__success(client, club):
     assert b"Clubs - Points:" in response.data
 
     for club_member in clubs:
-        assert str.encode(f'{club_member["name"]} - {club_member["points"]}') in response.data
+        assert str.encode(f'{club_member["name"]}: {club_member["points"]} points') in response.data
 
 
 def test_login_for_unknown_email__failure(client, club):
