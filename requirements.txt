@@ -3,6 +3,7 @@ certifi==2021.5.30
 chardet==4.0.0
 click==7.1.2
 ConfigArgParse==1.4.1
+coverage==5.5
 Flask==1.1.2
 Flask-BasicAuth==0.2.0
 gevent==21.1.2
