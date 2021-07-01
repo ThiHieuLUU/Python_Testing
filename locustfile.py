@@ -71,8 +71,6 @@ class WebUser(HttpUser):
 
     @task
     def login(self):
-        self.club = clubs[0]
-        print(self.club)
         self.client.post(
             "/showSummary", data=dict(
                 email=self.club["email"],

@@ -44,6 +44,8 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def show_summary():
+    competitions = load_competitions()
+    clubs = load_clubs()
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
     except IndexError:
