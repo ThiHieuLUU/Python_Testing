@@ -26,25 +26,28 @@ def future_time():
     return ten_days_after.strftime(time_format)
 
 
-def get_new_club(index):
+def get_new_club(club_index):
     new_club = {
-        "name": 'club' + str(index),
-        "email": 'club' + str(index) + "@gmail.com",
+        "name": 'club' + str(club_index),
+        "email": 'club' + str(club_index) + "@gmail.com",
         "points": "10"
     }
     return new_club
 
 
-def get_new_competition(index):
+def get_new_competition(competition_index):
     competition_date = future_time()
     new_competition = {
-        "name": 'competition' + str(index),
+        "name": 'competition' + str(competition_index),
         "date": competition_date,
         "points": "100"
     }
     return new_competition
 
+
 index = 0
+
+
 class WebUser(HttpUser):
     wait_time = between(1, 10)
 
@@ -74,11 +77,11 @@ class WebUser(HttpUser):
     #             email=self.club["email"],
     #         ), allow_redirects=True)
 
-    # def on_stop(self):
-    #     clubs.pop()
-    #     competitions.pop()
-    #     update_competitions_json({"competitions": COMPETITIONS})
-    #     update_clubs_json({"clubs": CLUBS})
+    def on_stop(self):
+        clubs.pop()
+        competitions.pop()
+        update_competitions_json({"competitions": COMPETITIONS})
+        update_clubs_json({"clubs": CLUBS})
 
     # @task
     # def purchase_places(self):
