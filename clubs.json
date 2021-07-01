@@ -1,16 +1,1 @@
-{"clubs":[
-    {
-        "name":"Simply Lift",
-        "email":"john@simplylift.co",
-        "points":"13"
-    },
-    {
-        "name":"Iron Temple",
-        "email": "admin@irontemple.com",
-        "points":"4"
-    },
-    {   "name":"She Lifts",
-        "email": "kate@shelifts.co.uk",
-        "points":"12"
-    }
-]}
+{"clubs": [{"name": "Simply Lift", "email": "john@simplylift.co", "points": "13"}, {"name": "Iron Temple", "email": "admin@irontemple.com", "points": "4"}, {"name": "She Lifts", "email": "kate@shelifts.co.uk", "points": "12"}, {"name": "club0", "email": "club0@gmail.com", "points": "10"}, {"name": "club1", "email": "club1@gmail.com", "points": "10"}, {"name": "club2", "email": "club2@gmail.com", "points": "10"}, {"name": "club3", "email": "club3@gmail.com", "points": "10"}, {"name": "club4", "email": "club4@gmail.com", "points": "10"}, {"name": "club5", "email": "club5@gmail.com", "points": "10"}, {"name": "club6", "email": "club6@gmail.com", "points": "10"}, {"name": "club7", "email": "club7@gmail.com", "points": "10"}, {"name": "club8", "email": "club8@gmail.com", "points": "10"}, {"name": "club9", "email": "club9@gmail.com", "points": "10"}, {"name": "club10", "email": "club10@gmail.com", "points": "10"}, {"name": "club11", "email": "club11@gmail.com", "points": "10"}]}
