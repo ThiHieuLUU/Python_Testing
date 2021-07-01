@@ -86,11 +86,20 @@ class WebUser(HttpUser):
         competition_name = self.competition["name"]
         places_required = 1
 
-        self.client.post("/purchasePlaces", data=dict(
-            places=places_required,
-            club=club_name,
-            competition=competition_name),
-                         allow_redirects=True)
+        # See: https://docs.locust.io/en/stable/writing-a-locustfile.html:
+        # You can also mark a request as successful, even if the response code was bad.
+        # Here, some errors are captured (booking more than 12 places, more than competitions' places, etc.)
+        with self.client.post(
+                "/purchasePlaces",
+                data=dict(
+                    places=places_required,
+                    club=club_name,
+                    competition=competition_name
+                ),
+                allow_redirects=True,
+                catch_response=True) as response:
+            if response.status_code == 403:
+                response.success()
 
     def on_stop(self):
         """Teardown: after all tests, come back to the original data."""
