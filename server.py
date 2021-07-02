@@ -5,6 +5,7 @@ import json
 from flask import Flask, render_template, request, redirect, flash, url_for, abort
 
 MAX_PLACES = 12
+NUMBER_OF_POINTS_PER_PLACE = 3
 
 
 def load_clubs():
@@ -89,13 +90,14 @@ def purchase_places():
     available_places = int(competition['number_of_places'])
 
     booking_conditions = {
-        "available_point": available_point,
+        "available_club_ability": int(available_point/NUMBER_OF_POINTS_PER_PLACE),
         "max_places": MAX_PLACES,
         "available_places": available_places
     }
 
     error_messages = {
-        "available_point": "You can't book more than your available points!",
+        # "available_point": "You can't book more than your available points!",
+        "available_club_ability": "You can't book more than a third of your available points!",
         "max_places": "You can't book more than 12 places!",
         "available_places": "You can't book more than available places of this competition!"
     }
@@ -123,7 +125,7 @@ def purchase_places():
         # competition['number_of_places'] = available_places - places_required
         flash('Great - booking complete!')
 
-        new_available_point = available_point - places_required
+        new_available_point = available_point - places_required*NUMBER_OF_POINTS_PER_PLACE
         new_number_of_places = available_places - places_required
 
         # Update club's point after purchase
