@@ -165,8 +165,9 @@ def test_purchase_places_using_more_than_club_points__failure(client, club, futu
     WHEN the secretary wants to book places which is greater than a third of the club's points
     THEN they receive an error message
     """
-    # Make sure that club's points is smaller than MAX_PLACES and competition's available places
-    # in order to receive the corresponding error message
+    # Make sure that club's points/NUMBER_OF_POINTS_PER_PLACE is smaller than MAX_PLACES and competition's available
+    # places in order to receive the corresponding error message
+
     club["points"] = MAX_PLACES - 1
     club = update_club()
     club_name = club["name"]
@@ -262,7 +263,7 @@ def test_purchase_reflect_points_remained(client, club, future_competition):
     competition = update_competition()
     competition_name = competition['name']
 
-    places_required = int(int(club["points"])/NUMBER_OF_POINTS_PER_PLACE)
+    places_required = int(int(club["points"])/NUMBER_OF_POINTS_PER_PLACE)  # It's is a valid request.
     available_point = int(club['points'])
     new_available_point = available_point - places_required*NUMBER_OF_POINTS_PER_PLACE
 
