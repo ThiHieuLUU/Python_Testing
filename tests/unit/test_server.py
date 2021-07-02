@@ -9,7 +9,8 @@ from server import (
     load_competitions,
     update_clubs_json,
     update_competitions_json,
-    MAX_PLACES
+    MAX_PLACES,
+    NUMBER_OF_POINTS_PER_PLACE
 )
 
 # The original data
@@ -193,9 +194,10 @@ def test_purchase_more_than_12_places_per_competition__failure(client, club, fut
     WHEN the secretary wants to book more than 12 places per competition
     THEN they receive an error message
     """
-    # Make sure that MAX_PLACES is smaller than club's points and competition's available places
-    # in order to receive the corresponding error message
-    club["points"] = MAX_PLACES + 1
+    # Make sure that MAX_PLACES is smaller than (club's points/NUMBER_OF_POINTS_PER_PLACE) and competition's
+    # available places in order to receive the corresponding error message
+
+    club["points"] = (MAX_PLACES + 1)*NUMBER_OF_POINTS_PER_PLACE
     club = update_club()
     club_name = club["name"]
 
