@@ -247,7 +247,7 @@ def test_purchase_more_than_available_places_of_competition__failure(client, clu
     assert b"You can't book more than available places of this competition!" in response.data
 
 
-def test_purchase_reflect_points_remained(client, club, future_competition, valid_places_required):
+def test_purchase_reflect_points_remained(client, club, future_competition):
     """
     GIVEN a club logged in
     WHEN the secretary books some places with success
@@ -262,11 +262,12 @@ def test_purchase_reflect_points_remained(client, club, future_competition, vali
     competition = update_competition()
     competition_name = competition['name']
 
+    places_required = int(int(club["points"])/NUMBER_OF_POINTS_PER_PLACE)
     available_point = int(club['points'])
-    new_available_point = available_point - valid_places_required
+    new_available_point = available_point - places_required*NUMBER_OF_POINTS_PER_PLACE
 
     response = client.post("/purchasePlaces", data=dict(
-        places=valid_places_required,
+        places=places_required,
         club=club_name,
         competition=competition_name,
     ), follow_redirects=True)
