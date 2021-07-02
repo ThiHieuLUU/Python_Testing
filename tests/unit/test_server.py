@@ -79,7 +79,7 @@ def valid_places_required(club, future_competition):
     """Make sure the places required is valid.
     It means that the request is not exceeded: club's points/3, MAX_PLACES and competition's available places.
     """
-    places_required = min(int(int(club['points'])/3), MAX_PLACES, int(future_competition["number_of_places"]))
+    places_required = min(int(int(club['points'])/NUMBER_OF_POINTS_PER_PLACE), MAX_PLACES, int(future_competition["number_of_places"]))
     return places_required
 
 
@@ -224,9 +224,9 @@ def test_purchase_more_than_available_places_of_competition__failure(client, clu
     WHEN the secretary wants to book more than available places of a competition
     THEN they receive an error message
     """
-    # Make sure that competition's available places is smaller than club's points and MAX_PLACES
-    # in order to receive the corresponding error message
-    club["points"] = MAX_PLACES
+    # Make sure that competition's available places is smaller than (club's points)/NUMBER_OF_POINTS_PER_PLACE and
+    # MAX_PLACES in order to receive the corresponding error message
+    club["points"] = MAX_PLACES*NUMBER_OF_POINTS_PER_PLACE
     club = update_club()
     club_name = club["name"]
 
