@@ -76,9 +76,9 @@ def past_competition(past_time):
 @pytest.fixture
 def valid_places_required(club, future_competition):
     """Make sure the places required is valid.
-    It means that the request is not exceeded: club's points, MAX_PLACES and competition's available places.
+    It means that the request is not exceeded: club's points/3, MAX_PLACES and competition's available places.
     """
-    places_required = min(int(club['points']), MAX_PLACES, int(future_competition["number_of_places"]))
+    places_required = min(int(int(club['points'])/3), MAX_PLACES, int(future_competition["number_of_places"]))
     return places_required
 
 
@@ -161,7 +161,7 @@ def test_purchase_places__success(client, club, future_competition, valid_places
 def test_purchase_places_using_more_than_club_points__failure(client, club, future_competition):
     """
     GIVEN a club logged in
-    WHEN the secretary wants to book places which is greater than the club's points
+    WHEN the secretary wants to book places which is greater than a third of the club's points
     THEN they receive an error message
     """
     # Make sure that club's points is smaller than MAX_PLACES and competition's available places
@@ -175,8 +175,8 @@ def test_purchase_places_using_more_than_club_points__failure(client, club, futu
     competition = update_competition()
     competition_name = competition['name']
 
-    # Case not allowed: places required is greater than the available points of the club
-    places_required = club["points"] + 1
+    # Case not allowed: places required is greater than a third of the available points of the club
+    places_required = int(club["points"]/3) + 1
     response = client.post("/purchasePlaces", data=dict(
         places=places_required,
         club=club_name,
@@ -184,7 +184,7 @@ def test_purchase_places_using_more_than_club_points__failure(client, club, futu
     ), follow_redirects=True)
 
     assert response.status_code == 403
-    assert b"You can't book more than your available points!" in response.data
+    assert b"You can't book more than a third of your available points!" in response.data
 
 
 def test_purchase_more_than_12_places_per_competition__failure(client, club, future_competition):
