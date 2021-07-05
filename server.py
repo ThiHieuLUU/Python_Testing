@@ -94,7 +94,7 @@ def purchase_places():
     available_places = int(competition['number_of_places'])
 
     booking_conditions = {
-        "available_club_ability": int(available_point/NUMBER_OF_POINTS_PER_PLACE),
+        "available_club_ability": int(available_point / NUMBER_OF_POINTS_PER_PLACE),
         "max_places": MAX_PLACES,
         "available_places": available_places
     }
@@ -129,7 +129,7 @@ def purchase_places():
         # competition['number_of_places'] = available_places - places_required
         flash('Great - booking complete!')
 
-        new_available_point = available_point - places_required*NUMBER_OF_POINTS_PER_PLACE
+        new_available_point = available_point - places_required * NUMBER_OF_POINTS_PER_PLACE
         new_number_of_places = available_places - places_required
 
         # Update club's point after purchase
@@ -143,13 +143,6 @@ def purchase_places():
         update_competitions_json({"competitions": competitions_updated})
 
         return render_template('welcome.html', club=club, competitions=competitions_updated, clubs=clubs_updated)
-
-
-# TODO: Add route for points display
-@app.route('/clubsPoints')
-def display_clubs_points():
-    clubs_updated = load_clubs()
-    return render_template('index.html', clubs=clubs_updated)
 
 
 @app.route('/logout')
