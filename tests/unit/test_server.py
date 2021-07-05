@@ -1,5 +1,4 @@
 #!/usr/bin/venv python3
-
 import pytest
 from datetime import timedelta, datetime
 
@@ -414,3 +413,18 @@ def test_clubs_points_board_updated_when_log_out(client):
     clubs_updated = load_clubs()
     for club_member in clubs_updated:
         assert str.encode(f'{club_member["name"]}: {club_member["points"]} points') in response.data
+
+
+def test_competitions_places_displayed_correctly_while_booking(client, club, future_competition):
+    """
+    GIVEN a club logged in
+    WHEN the secretary clicks on the "Book Places" from welcome page
+    THEN they see the updated competitions' places
+    """
+    competition = future_competition
+    competition["number_of_places"] = 100
+    competition = update_competition()
+    parameters = '/'.join([competition["name"], club["name"]])
+    response = client.get("/book/" + parameters)
+    assert response.status_code == 200
+    assert str.encode(f'Places available: {competition["number_of_places"]}') in response.data
