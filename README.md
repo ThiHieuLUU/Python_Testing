@@ -49,14 +49,35 @@
     We also like to show how well we're testing, so there's a module called 
     [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
 
+
 6. Resume on test commands
-```
-   coverage run --omit 'venv/*' -m pytest tests/unit/test_server.py
-   coverage html
-```
-See the report, for example:
-```
-firefox htmlcov/index.html &
-```
+   
+   6.1. With coverage
+   ```
+      coverage run --omit 'venv/*' -m pytest tests/unit/test_server.py
+      coverage html
+   ```
+   See the report, for example:
+   ```
+   firefox htmlcov/index.html &
+   ```
+   6.2. With locust
+
+- Launch server.py
+   ```
+      export FLASK_APP=server.py
+      python -m flask run
+   ```
+- Launch Locust tests:
+   ```
+      locust
+   ```
+Then go to http://0.0.0.0:8089 and enter the parameters, for examples: 
+
+- Number of total users to simulate: 10
+- Spawn rate (users spawned/second): 3
+- Host (e.g. http://www.example.com): http://127.0.0.1:5000/
+
+After running then stopping Locust tests, go to "Download Data" to download the locust report.
    
    
