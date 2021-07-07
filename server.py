@@ -86,8 +86,9 @@ def purchase_places():
 
     clubs_dict = build_dict(clubs_updated, key="name")
     club_name = request.form['club']
-    club = clubs_dict.get(club_name)  # index key is added in information of club
-    club_index = club["index"]  # index of the competition in the list from json file
+    club_with_index = clubs_dict.get(club_name)  # index key is added in information of club
+    club_index = club_with_index["index"]  # index of the competition in the list from json file
+    club = clubs_updated[club_index]
 
     places_required = int(request.form['places'])
     available_point = int(club['points'])
@@ -148,7 +149,3 @@ def purchase_places():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
-
-
-if __name__ == "__main__":
-    app.run(debug=True)

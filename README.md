@@ -54,30 +54,28 @@
    
    6.1. With coverage
    ```
-      coverage run --omit 'venv/*' -m pytest tests/unit/test_server.py
-      coverage html
+   coverage run --omit 'venv/*' -m pytest tests/
+   coverage html
    ```
-   See the report, for example:
+   See the report in `index.html` file , detail for unit tests and integration tests will be shown. For example:
    ```
    firefox htmlcov/index.html &
    ```
    6.2. With locust
-
-- Launch server.py
+   - Launch flask app (see `.flaskenv` file):
    ```
-      export FLASK_APP=server.py
-      python -m flask run
+   flask run
    ```
-- Launch Locust tests:
+   - Launch Locust tests:
    ```
-      locust
+   locust
    ```
-Then go to http://0.0.0.0:8089 and enter the parameters, for examples: 
-
-- Number of total users to simulate: 10
-- Spawn rate (users spawned/second): 3
-- Host (e.g. http://www.example.com): http://127.0.0.1:5000/
-
-After running then stopping Locust tests, go to "Download Data" to download the locust report.
+   Then go to http://0.0.0.0:8089 and enter the parameters, for examples: 
    
+   - Number of total users to simulate: 10
+   - Spawn rate (users spawned/second): 3
+   - Host (e.g. http://www.example.com): http://127.0.0.1:5000/
+   
+   After running then stopping Locust tests, go to "Download Data" to download the locust report.
+      
    
