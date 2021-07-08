@@ -22,12 +22,12 @@ def load_competitions():
 
 def update_clubs_json(updated_clubs):
     with open("clubs.json", "w") as c:
-        json.dump(updated_clubs, c)
+        c.write(json.dumps(updated_clubs, sort_keys=True, indent=4, separators=(',', ': ')))
 
 
 def update_competitions_json(updated_competitions):
     with open("competitions.json", "w") as comps:
-        json.dump(updated_competitions, comps)
+        comps.write(json.dumps(updated_competitions, sort_keys=True, indent=4, separators=(',', ': ')))
 
 
 app = Flask(__name__)
