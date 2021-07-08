@@ -56,12 +56,6 @@ class IntegrationTest(TestCase):
         update_competitions_json({"competitions": COMPETITIONS})
 
     def test_integration(self):
-        # The data to test
-        clubs = load_clubs()  # Not doing: clubs = CLUBS because copy of list will make changing CLUBS if clubs change
-        competitions = load_competitions()  # the same reason for competitions
-
-        self.render_templates = False
-
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assert_template_used('index.html')
